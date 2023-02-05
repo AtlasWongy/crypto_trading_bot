@@ -1,0 +1,7 @@
+{
+    "api_key": "WNBzXKum6iEEwlowUozKd1EIR1U9AS7gLJd1IHL7diuEtuHXpuZOwqH7S9AAbT7y",
+    "secure_key": "fj420Ni0CsyOV5cQMLRbYHDp9vnYztamedGoL7uD3OFmKVcXU47ofMjUU5UIbCw3",
+    "symbol": "ETHBUSD",
+    "base_url": "wss://fstream.binance.com/ws",
+    "ping_interval": 300
+}
