@@ -31,7 +31,14 @@ async def get_current_price(config):
                 async for message in websocket:
                     try:
                         data = json.loads(message)
-                        
+                        await calculate_bollinger_band(
+                            data['k']['t'],
+                            data['k']['T'],
+                            data['k']['o'], 
+                            data['k']['c'], 
+                            data['k']['h'], 
+                            data['k']['l']
+                        )
                     except KeyError:
                         print("Faulty data received from API")
                         continue
