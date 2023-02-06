@@ -1,17 +1,10 @@
 from datetime import datetime, timezone
+from bollinger import calculate_bollinger_band
 import asyncio
 import json
 import websockets
 import sys
 
-# Set the base URL for the Binance API
-# base_url = "wss://fstream.binance.com/ws"
-
-# Set the symbol for the commodity
-# symbol = "ETHBUSD"
-
-# Set the ping interval in seconds
-# ping_interval = 300
 
 async def ping(websocket, ping_interval):
     while True:
@@ -38,12 +31,7 @@ async def get_current_price(config):
                 async for message in websocket:
                     try:
                         data = json.loads(message)
-                        print(data)
-                        # current_price = data['k']['c']
-                        # print(f"Current price of {config['symbol']}: {current_price} ({datetime.now()} - {datetime.now(timezone.utc).timestamp()*1000 - data['E']})")
-                        # if data['k']['x']:
-                        #     candlestick_data = data['k']
-                        #     print(f"5 minute candlestick data: {candlestick_data}")
+                        
                     except KeyError:
                         print("Faulty data received from API")
                         continue
