@@ -26,7 +26,8 @@ async def get_current_price(config):
             async with websockets.connect(endpoint) as websocket:
                 # Send the API key and secret to authenticate the connection
                 payload = {
-                    
+                    "apiKey": config['api_key'],
+                    "secret": config['secure_key']
                 }
                 await websocket.send(json.dumps(payload))
 
@@ -37,11 +38,12 @@ async def get_current_price(config):
                 async for message in websocket:
                     try:
                         data = json.loads(message)
-                        current_price = data['k']['c']
-                        print(f"Current price of {config['symbol']}: {current_price} ({datetime.now()} - {datetime.now(timezone.utc).timestamp()*1000 - data['E']})")
-                        if data['k']['x']:
-                            candlestick_data = data['k']
-                            print(f"5 minute candlestick data: {candlestick_data}")
+                        print(data)
+                        # current_price = data['k']['c']
+                        # print(f"Current price of {config['symbol']}: {current_price} ({datetime.now()} - {datetime.now(timezone.utc).timestamp()*1000 - data['E']})")
+                        # if data['k']['x']:
+                        #     candlestick_data = data['k']
+                        #     print(f"5 minute candlestick data: {candlestick_data}")
                     except KeyError:
                         print("Faulty data received from API")
                         continue
