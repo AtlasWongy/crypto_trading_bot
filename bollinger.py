@@ -6,7 +6,8 @@ import asyncio
 periods = 20
 std = 2
 
-async def calculate_bollinger_band(start_time,close_time,open_price, close_price, high_price, low_price):
+
+async def calculate_bollinger_band(start_time, close_time, open_price, close_price, high_price, low_price):
     print("----------------")
     print("The open price: ", open_price)
     print("The close price: ", close_price)
@@ -18,26 +19,29 @@ async def calculate_bollinger_band(start_time,close_time,open_price, close_price
     # Time conversion
     # Convert unix timestamp to current normal time stamp
 
+    # Empty csv for new data
+
     # Write information to the csv file
     with open('currency_info.csv', 'a', newline='') as file:
         writing = csv.writer(file)
-        writing.writerow([open_price, close_price, high_price, low_price])
+        with open("currency_info.csv", "r") as file:
+            csvreader = pd.read_csv(file)
+            if len(csvreader) >= periods + 1:
+                print(len(csvreader))
+
+                print("Proceed calculating Bollinger Bands...")
+                sma_calculated = csvreader[-periods -
+                                           1:]['close_price'].mean()
+                print("The calculated SMA: ", sma_calculated)
+                writing.writerow(
+                    [open_price, close_price, high_price, low_price, sma_calculated])
+
+            else:
+                print(len(csvreader))
+                writing.writerow(
+                    [open_price, close_price, high_price, low_price, None])
         file.close()
 
-    # Read the first 20 row
-    with open("currency_info.csv", "r") as file:
-        csvreader = pd.read_csv(file)
-        if len(csvreader) >= periods + 1:
-            print("Proceed calculating Bollinger Bands...")
-            # with open('currency_info.csv', 'a', newline='') as file:
-            #     writing = csv.writer(file)
-            sma_calculated = csvreader[-periods - 1:]['close_price'].rolling(window=20).mean()
-            print("The calculated SMA: ", sma_calculated)
-
-            # print(csvreader[-periods - 1:])
-
-        else:
-            pass
 
 # async def time_conversion(start_time_unix, close_time_unix):
 #     start_time = datetime.fromtimestamp(start_time_unix)
