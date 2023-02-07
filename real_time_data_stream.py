@@ -25,7 +25,7 @@ async def get_current_price(config):
     # Connect to the websocket endpoint
     endpoint = f"{config['base_url']}/{config['symbol'].lower()}@kline_5m"
     # clean csv for each run
-    await clean_csv('currency_info.csv')
+    # await clean_csv('currency_info.csv')
     while True:
         try:
             async with websockets.connect(endpoint) as websocket:
@@ -49,7 +49,9 @@ async def get_current_price(config):
                             data['k']['o'],
                             data['k']['c'],
                             data['k']['h'],
-                            data['k']['l']
+                            data['k']['l'],
+                            data['k']['x'],
+                            data['k']['i']
                         )
                     except KeyError:
                         print("Faulty data received from API")

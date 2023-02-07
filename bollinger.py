@@ -4,13 +4,19 @@ import csv
 import asyncio
 
 
-periods = 20
+internal = 0.05  # 9s
+periods = 1
+# update every 1 second, x min candle stick = x*60 row of records
+# hence, every 300 records >> will be one 5 min candle stick
+interval_records_num = internal*periods*60
 std = 2
 
 
 async def sma_std(csvreader, periods):
-    sma_calculated = csvreader[-periods - 1:]['close_price'].mean()
-    stddev_calculated = csvreader[-periods - 1:]['close_price'].std()
+    kline_ind = csvreader.index[csvreader['is_interval_end']
+                                == 'True'].tolist()
+    sma_calculated = csvreader[kline_ind]['close_price'].mean()
+    stddev_calculated = csvreader[kline_ind]['close_price'].std()
     band_higher = sma_calculated + 2*stddev_calculated
     band_lower = sma_calculated - 2*stddev_calculated
     # print("The calculated SMA: ", sma_calculated)
@@ -31,14 +37,14 @@ async def trade_condition(close_price, band_higher, band_lower):
     return buy_or_sell
 
 
-async def calculate_bollinger_band(start_time, close_time, open_price, close_price, high_price, low_price):
+async def calculate_bollinger_band(start_time, close_time, open_price, close_price, high_price, low_price, is_interval_end, kline_interval):
     print("----------------")
     print("The open price: ", open_price)
     print("The close price: ", close_price)
     print("The high price: ", high_price)
     print("The low price: ", low_price)
-    print("The start time: ", start_time)
-    print("The close time: ", close_time)
+    # print("The start time: ", start_time) #this start and close time is for the 5 min candlestick
+    # print("The close time: ", close_time)
 
     # Time conversion
     # Convert unix timestamp to current normal time stamp
@@ -48,7 +54,12 @@ async def calculate_bollinger_band(start_time, close_time, open_price, close_pri
         writing = csv.writer(file)
         with open("currency_info.csv", "r") as file:
             csvreader = pd.read_csv(file)
-            if len(csvreader) >= periods + 1:
+            print("In interval " +
+                  kline_interval+"... End? "+str(is_interval_end)+"...")
+            # change to periods*interval_records_num?? enough for 20 5-min stick
+            # and use is_interval_end to decide whether this candlestick is for the entire 5min
+            if (len(csvreader) >= periods*interval_records_num and is_interval_end == True):
+                # if (len(csvreader) >= periods + 1):
                 print("Proceed calculating Bollinger Bands...")
 
                 # Calculate SMA, std, higher, lower
@@ -61,11 +72,11 @@ async def calculate_bollinger_band(start_time, close_time, open_price, close_pri
 
                 # Updat CSV
                 writing.writerow(
-                    [open_price, close_price, high_price, low_price, sma_calculated, band_higher, band_lower, buy_or_sell])
+                    [open_price, close_price, high_price, low_price, is_interval_end, sma_calculated, band_higher, band_lower, buy_or_sell])
                 print(len(csvreader))
             else:
                 writing.writerow(
-                    [open_price, close_price, high_price, low_price, 'Nah', 'Nah', 'Nah', 'Nah'])
+                    [open_price, close_price, high_price, low_price, is_interval_end, 'Nah', 'Nah', 'Nah', 'Nah'])
                 print(len(csvreader))
 
         file.close()

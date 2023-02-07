@@ -2,8 +2,8 @@ from datetime import datetime, timezone
 import pandas as pd
 import csv
 periods = 20
+# this is just a draft file for random testing
 
-print('ga')
 with open("currency_info.csv", "r") as file:
     csvreader = pd.read_csv(file)
     if len(csvreader) >= periods + 1:

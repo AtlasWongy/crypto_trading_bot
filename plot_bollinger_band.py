@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import csv
 
+# this plot to be changed
 periods = 20
 with open("currency_info.csv", "r") as file:
     csvreader = pd.read_csv(file)
@@ -9,9 +10,9 @@ with open("currency_info.csv", "r") as file:
     # plt.plot(csvreader['close_price'], label="close_price")
     # plt.plot(float(csvreader['SMA']), label="SMA")
     # plt.plot(csvreader[['SMA', 'Upper']], label="SMA")
-    df = csvreader['Upper'].index[periods+1:]
-    print(csvreader['SMA'])
-    print(csvreader.dtypes)
+    kline_ind = csvreader.index[csvreader['is_interval_end']
+                                == 'True'].tolist()
+    csvreader = csvreader[kline_ind]
     ind = csvreader['Upper'].index[periods+1:]
     upper = csvreader['Upper'][periods+1:].astype(float)
     lower = csvreader['Lower'][periods+1:].astype(float)
