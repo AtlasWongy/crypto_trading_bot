@@ -13,14 +13,19 @@ async def ping(websocket, ping_interval):
         await websocket.ping()
 
 
+async def clean_csv(csv_name):
+    with open(csv_name, 'w', newline='') as file:
+        writing = csv.writer(file)
+        writing.writerow(['open_price', 'close_price',
+                          'high_price', 'low_price', 'SMA', 'Upper', 'Lower', 'Buy/Sell'])
+        file.close()
+
+
 async def get_current_price(config):
     # Connect to the websocket endpoint
     endpoint = f"{config['base_url']}/{config['symbol'].lower()}@kline_5m"
     # clean csv for each run
-    with open('currency_info.csv', 'w', newline='') as file:
-        writing = csv.writer(file)
-        writing.writerow(['open_price', 'close_price',
-                          'high_price', 'low_price', 'SMA'])
+    await clean_csv('currency_info.csv')
     while True:
         try:
             async with websockets.connect(endpoint) as websocket:
