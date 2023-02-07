@@ -12,15 +12,16 @@ with open("currency_info.csv", "r") as file:
     df = csvreader['Upper'].index[periods+1:]
     print(csvreader['SMA'])
     print(csvreader.dtypes)
-    ind = csvreader['Upper'].index[21:]
-    upper = csvreader['Upper'][21:].astype(float)
-    lower = csvreader['Lower'][21:].astype(float)
-    buy_ind = csvreader[21:].index[csvreader['Buy/Sell']
-                                   [21:] == 'buy'].tolist()
-    sell_ind = csvreader[21:].index[csvreader['Buy/Sell']
-                                    [21:] == 'sell'].tolist()
-    plt.plot(csvreader['SMA'][21:].astype(float), label="SMA")
-    plt.plot(csvreader['close_price'][21:].astype(float), label="close_price")
+    ind = csvreader['Upper'].index[periods+1:]
+    upper = csvreader['Upper'][periods+1:].astype(float)
+    lower = csvreader['Lower'][periods+1:].astype(float)
+    buy_ind = csvreader[periods+1:].index[csvreader['Buy/Sell']
+                                          [periods+1:] == 'buy'].tolist()
+    sell_ind = csvreader[periods+1:].index[csvreader['Buy/Sell']
+                                           [periods+1:] == 'sell'].tolist()
+    plt.plot(csvreader['SMA'][periods+1:].astype(float), label="SMA")
+    plt.plot(csvreader['close_price']
+             [periods+1:].astype(float), label="close_price")
     plt.plot(upper, label="Upper")
     plt.plot(lower, label="Lower")
     plt.fill_between(ind, upper, lower, color='grey', alpha=0.3)
