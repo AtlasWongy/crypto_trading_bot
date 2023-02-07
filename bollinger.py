@@ -3,6 +3,7 @@ import pandas as pd
 import csv
 import asyncio
 
+
 periods = 20
 std = 2
 
