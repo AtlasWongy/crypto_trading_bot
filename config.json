@@ -3,5 +3,5 @@
     "secure_key": "fj420Ni0CsyOV5cQMLRbYHDp9vnYztamedGoL7uD3OFmKVcXU47ofMjUU5UIbCw3",
     "symbol": "ETHBUSD",
     "base_url": "wss://fstream.binance.com/ws",
-    "ping_interval": 9
+    "ping_interval": 60
 }

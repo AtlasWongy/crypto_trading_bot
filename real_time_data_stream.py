@@ -13,19 +13,23 @@ async def ping(websocket, ping_interval):
         await websocket.ping()
 
 
-async def clean_csv(csv_name):
+async def clean_csv(csv_name, csv_name_res):
     with open(csv_name, 'w', newline='') as file:
         writing = csv.writer(file)
-        writing.writerow(['open_price', 'close_price',
-                          'high_price', 'low_price', 'SMA', 'Upper', 'Lower', 'Buy/Sell'])
+        writing.writerow(['start_time', 'close_time', 'open_price', 'close_price',
+                          'high_price', 'low_price', 'is_interval_end'])
+        file.close()
+    with open(csv_name_res, 'w', newline='') as file:
+        writing = csv.writer(file)
+        writing.writerow(['start_time', 'close_time', 'open_price', 'close_price', 'high_price',
+                         'low_price', 'is_interval_end', 'SMA', 'StdDv', 'Upper', 'Lower', 'Buy/Sell'])
         file.close()
 
 
 async def get_current_price(config):
     # Connect to the websocket endpoint
-    endpoint = f"{config['base_url']}/{config['symbol'].lower()}@kline_5m"
-    # clean csv for each run
-    # await clean_csv('currency_info.csv')
+    endpoint = f"{config['base_url']}/{config['symbol'].lower()}@kline_1m"
+
     while True:
         try:
             async with websockets.connect(endpoint) as websocket:
@@ -53,6 +57,7 @@ async def get_current_price(config):
                             data['k']['x'],
                             data['k']['i']
                         )
+                    # this key error may come from other key error not API also
                     except KeyError:
                         print("Faulty data received from API")
                         continue
@@ -66,6 +71,8 @@ async def get_current_price(config):
 async def main():
     f = open('config.json')
     config = json.load(f)
+    # clean csv for each run
+    await clean_csv('currency_info.csv', 'bollinger_band.csv')
     await get_current_price(config)
 
 

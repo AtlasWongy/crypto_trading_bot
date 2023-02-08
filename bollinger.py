@@ -3,20 +3,19 @@ import pandas as pd
 import csv
 import asyncio
 
-
-internal = 0.05  # 9s
-periods = 1
+# I use some smaller number to test because 20*5min is too larger to test.
+interval = 1  # 1min
+periods = 2
 # update every 1 second, x min candle stick = x*60 row of records
 # hence, every 300 records >> will be one 5 min candle stick
-interval_records_num = internal*periods*60
 std = 2
 
 
-async def sma_std(csvreader, periods):
-    kline_ind = csvreader.index[csvreader['is_interval_end']
-                                == 'True'].tolist()
-    sma_calculated = csvreader[kline_ind]['close_price'].mean()
-    stddev_calculated = csvreader[kline_ind]['close_price'].std()
+async def sma_std(kline_interval, periods, kline_ind):
+    print(kline_interval['close_price'][kline_ind])
+    sma_calculated = kline_interval['close_price'][kline_ind].mean()
+    stddev_calculated = kline_interval['close_price'][kline_ind].std()
+    print(sma_calculated, stddev_calculated)
     band_higher = sma_calculated + 2*stddev_calculated
     band_lower = sma_calculated - 2*stddev_calculated
     # print("The calculated SMA: ", sma_calculated)
@@ -52,34 +51,48 @@ async def calculate_bollinger_band(start_time, close_time, open_price, close_pri
     # Write information to the csv file
     with open('currency_info.csv', 'a', newline='') as file:
         writing = csv.writer(file)
-        with open("currency_info.csv", "r") as file:
-            csvreader = pd.read_csv(file)
-            print("In interval " +
-                  kline_interval+"... End? "+str(is_interval_end)+"...")
-            # change to periods*interval_records_num?? enough for 20 5-min stick
-            # and use is_interval_end to decide whether this candlestick is for the entire 5min
-            if (len(csvreader) >= periods*interval_records_num and is_interval_end == True):
-                # if (len(csvreader) >= periods + 1):
-                print("Proceed calculating Bollinger Bands...")
-
-                # Calculate SMA, std, higher, lower
-                sma_calculated, stddev_calculated, band_higher, band_lower = await sma_std(
-                    csvreader, periods)
-
-                # Check if trade condition is met: Close price cross band
-                buy_or_sell = await trade_condition(
-                    float(close_price), band_higher, band_lower)
-
-                # Updat CSV
-                writing.writerow(
-                    [open_price, close_price, high_price, low_price, is_interval_end, sma_calculated, band_higher, band_lower, buy_or_sell])
-                print(len(csvreader))
-            else:
-                writing.writerow(
-                    [open_price, close_price, high_price, low_price, is_interval_end, 'Nah', 'Nah', 'Nah', 'Nah'])
-                print(len(csvreader))
-
+        writing.writerow(
+            [start_time, close_time, open_price, close_price, high_price, low_price, is_interval_end])
+        print([start_time, close_time, open_price, close_price,
+              high_price, low_price, is_interval_end])
         file.close()
+
+    with open("currency_info.csv", "r") as file_read, open('bollinger_band.csv', "r") as file_read_r:
+        csvreader = pd.read_csv(file_read)
+        csvreader_r = pd.read_csv(file_read_r)
+        print("In interval " +
+              kline_interval+"... End? "+str(is_interval_end)+"...")
+
+        # print(len(csvreader))
+        # print(csvreader)
+        # print([start_time, close_time, open_price, close_price,
+        #        high_price, low_price, is_interval_end])
+        kline_ind = csvreader.index[csvreader['is_interval_end']
+                                    == True].tolist()
+        print(kline_ind)
+        if (len(kline_ind) >= periods and is_interval_end == True):
+            # if (len(csvreader) >= periods + 1):
+            print("Proceed calculating Bollinger Bands...")
+            # print(kline_ind)
+            # Calculate SMA, std, higher, lower
+            sma_calculated, stddev_calculated, band_higher, band_lower = await sma_std(
+                csvreader, periods, kline_ind)
+
+            # Check if trade condition is met: Close price cross band
+            buy_or_sell = await trade_condition(
+                float(close_price), band_higher, band_lower)
+            print(start_time, close_time, open_price, close_price, high_price, low_price,
+                  is_interval_end, sma_calculated, stddev_calculated, band_higher, band_lower, buy_or_sell)
+            # Updat CSV
+            with open('bollinger_band.csv', 'a', newline='') as file_r:
+                writing_r = csv.writer(file_r)  # results file
+                writing_r.writerow(
+                    [start_time, close_time, open_price, close_price, high_price, low_price, is_interval_end, sma_calculated, stddev_calculated, band_higher, band_lower, buy_or_sell])
+                file_r.close()
+                print(len(csvreader_r))
+
+    file_read.close()
+    file_read_r.close()
 
 
 # async def time_conversion(start_time_unix, close_time_unix):
