@@ -1,2 +1,1 @@
 start_time,close_time,open_price,close_price,high_price,low_price,is_interval_end,SMA,StdDv,Upper,Lower,Buy/Sell
-1675835700000,1675835759999,1676.09,1676.36,1676.67,1676.08,True,1676.2199999999998,0.197989898732214,1676.6159797974642,1675.8240202025354,-
