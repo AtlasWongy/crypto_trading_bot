@@ -12,3 +12,4 @@ client = Client(
 
 client.API_URL = "https://testnet.binancefuture.com/fapi"
 
+print(client.futures_account_balance())
