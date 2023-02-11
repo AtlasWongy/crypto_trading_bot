@@ -28,15 +28,15 @@ async def clean_csv(csv_name, csv_name_res):
 
 async def get_current_price(config):
     # Connect to the websocket endpoint
-    endpoint = f"{config['base_url']}/{config['symbol'].lower()}@kline_1m"
+    endpoint = f"{config['test_net_futures']['test_net_url']}/{config['symbol'].lower()}@kline_1m"
 
     while True:
         try:
             async with websockets.connect(endpoint) as websocket:
                 # Send the API key and secret to authenticate the connection
                 payload = {
-                    "apiKey": config['api_key'],
-                    "secret": config['secure_key']
+                    "apiKey": config['test_net_futures']['api_key'],
+                    "secret": config['test_net_futures']['secure_key']
                 }
                 await websocket.send(json.dumps(payload))
 
@@ -47,16 +47,17 @@ async def get_current_price(config):
                 async for message in websocket:
                     try:
                         data = json.loads(message)
-                        await calculate_bollinger_band(
-                            data['k']['t'],
-                            data['k']['T'],
-                            data['k']['o'],
-                            data['k']['c'],
-                            data['k']['h'],
-                            data['k']['l'],
-                            data['k']['x'],
-                            data['k']['i']
-                        )
+                        print(data)
+                        # await calculate_bollinger_band(
+                        #     data['k']['t'],
+                        #     data['k']['T'],
+                        #     data['k']['o'],
+                        #     data['k']['c'],
+                        #     data['k']['h'],
+                        #     data['k']['l'],
+                        #     data['k']['x'],
+                        #     data['k']['i']
+                        # )
                     # this key error may come from other key error not API also
                     except KeyError:
                         print("Faulty data received from API")

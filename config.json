@@ -3,5 +3,10 @@
     "secure_key": "fj420Ni0CsyOV5cQMLRbYHDp9vnYztamedGoL7uD3OFmKVcXU47ofMjUU5UIbCw3",
     "symbol": "ETHBUSD",
     "base_url": "wss://fstream.binance.com/ws",
-    "ping_interval": 60
+    "ping_interval": 60,
+    "test_net_futures": {
+        "test_net_url": "wss://stream.binancefuture.com/ws",
+        "api_key": "09a137877556d37b7e7ec0eb1d550ca99f784fefeb32fe16edc8c9a3abb98efe",
+        "secure_key": "050d7b6e6c87b77363998933b31084118c839b14108f26689b77aaa0e2d6b7f8"
+    }
 }
