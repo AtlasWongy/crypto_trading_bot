@@ -5,5 +5,10 @@
     "base_url": "wss://fstream.binance.com/ws",
     "ping_interval": 300,
     "http_base_url_test": "https://testnet.binancefuture.com",
-    "http_base_url_live": "https://dapi.binance.com"
+    "http_base_url_live": "https://dapi.binance.com",
+    "test_net_futures": {
+        "test_net_url": "wss://stream.binancefuture.com/ws",
+        "api_key": "09a137877556d37b7e7ec0eb1d550ca99f784fefeb32fe16edc8c9a3abb98efe",
+        "secure_key": "050d7b6e6c87b77363998933b31084118c839b14108f26689b77aaa0e2d6b7f8"
+    }
 }

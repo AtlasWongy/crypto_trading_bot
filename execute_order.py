@@ -16,9 +16,10 @@ SLEEP_TIME = 5
 #     asyncio.sleep(SLEEP_TIME)
 # return
 async def execute_order(config, symbol, price, quantity):
-    endpoint = f"{config['http_base_url_live']}/dapi/v1/order"
-    data = createDataAndSignature(config['secure_key'], symbol, price, quantity)
-    headers = {"Content-Type": "application/x-www-form-urlencoded", "X-MBX-APIKEY":config['api_key']}
+    endpoint = f"{config['http_base_url_test']}/dapi/v1/order"
+    data = createDataAndSignature(config['test_net_futures']['secure_key'], symbol, price, quantity)
+    headers = {"Content-Type": "application/x-www-form-urlencoded", "X-MBX-APIKEY":config['test_net_futures']['api_key']}
+    # headers = {"Content-Type": "application/x-www-form-urlencoded", "X-MBX-APIKEY":config['api_key']}
 
     try:
         resp = requests.post(url = endpoint, headers=headers, data = data, timeout=10)
@@ -60,7 +61,7 @@ def createDataAndSignature(secretKey, symbol, price, quantity):
 async def test():
     f = open('config.json')
     config = json.load(f)
-    await execute_order(config, "DOGE", 1, 100)
+    await execute_order(config, "BTCUSD_230331", 23000, 100)
 
 if __name__ == "__main__":
     asyncio.run(test())
