@@ -13,8 +13,6 @@ with open('currency_info.csv', 'a', newline='') as file, open('bollinger_band.cs
                                     == False].tolist()
         # sell_ind = csvreader[periods+1:].index[csvreader['Buy/Sell']
         #                                   [periods+1:] == 'sell'].tolist()
-        print(len(csvreader))
-        print(type(len(csvreader)))
-        kline_ind.append(len(csvreader))
+        periods = 2
+        print(kline_ind[-periods:])
         print(kline_ind)
-        print(csvreader['close_price'][kline_ind])
