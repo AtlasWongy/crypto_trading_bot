@@ -10,16 +10,16 @@ with open("csv/bollinger_band.csv", "r") as file:
     # plt.plot(csvreader['close_price'], label="close_price")
     # plt.plot(float(csvreader['SMA']), label="SMA")
     # plt.plot(csvreader[['SMA', 'Upper']], label="SMA")
-    ind = csvreader['Upper'].index[periods+1:]
-    upper = csvreader['Upper'][periods+1:].astype(float)
-    lower = csvreader['Lower'][periods+1:].astype(float)
-    buy_ind = csvreader[periods+1:].index[csvreader['Buy/Sell']
-                                          [periods+1:] == 'buy'].tolist()
-    sell_ind = csvreader[periods+1:].index[csvreader['Buy/Sell']
-                                           [periods+1:] == 'sell'].tolist()
-    plt.plot(csvreader['SMA'][periods+1:].astype(float), label="SMA")
+    ind = csvreader['Upper'].index
+    upper = csvreader['Upper'] .astype(float)
+    lower = csvreader['Lower'].astype(float)
+    buy_ind = csvreader.index[csvreader['Buy/Sell']
+                              == 'buy'].tolist()
+    sell_ind = csvreader.index[csvreader['Buy/Sell']
+                               == 'sell'].tolist()
+    plt.plot(csvreader['SMA'].astype(float), label="SMA")
     plt.plot(csvreader['close_price']
-             [periods+1:].astype(float), label="close_price")
+             .astype(float), label="close_price")
     plt.plot(upper, label="Upper")
     plt.plot(lower, label="Lower")
     plt.fill_between(ind, upper, lower, color='grey', alpha=0.3)
@@ -27,7 +27,7 @@ with open("csv/bollinger_band.csv", "r") as file:
                 [buy_ind], marker='^', color='g')
     plt.scatter(sell_ind, csvreader['close_price']
                 [sell_ind], marker='v', color='r')
-    print(buy_ind)
+    print(ind)
     # plt.scatter()
 plt.legend()
 plt.show()

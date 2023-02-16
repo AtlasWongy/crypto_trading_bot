@@ -5,7 +5,7 @@ import asyncio
 
 # I use some smaller number to test because 20*5min is too larger to test.
 interval = 1  # 1min
-periods = 2
+periods = 5
 # update every 1 second, x min candle stick = x*60 row of records
 # hence, every 300 records >> will be one 5 min candle stick
 std = 2
@@ -13,8 +13,10 @@ std = 2
 
 async def sma_std(kline_interval, periods, kline_ind):
     print(kline_interval['close_price'][kline_ind])
-    sma_calculated = kline_interval['close_price'][kline_ind].mean()
-    stddev_calculated = kline_interval['close_price'][kline_ind].std()
+    cal_kline_ind = kline_ind[-periods:]
+    print(cal_kline_ind)
+    sma_calculated = kline_interval['close_price'][cal_kline_ind].mean()
+    stddev_calculated = kline_interval['close_price'][cal_kline_ind].std()
     print(sma_calculated, stddev_calculated)
     band_higher = sma_calculated + 2*stddev_calculated
     band_lower = sma_calculated - 2*stddev_calculated
