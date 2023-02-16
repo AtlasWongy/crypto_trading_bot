@@ -3,7 +3,6 @@ from bollinger import calculate_bollinger_band
 import asyncio
 import json
 import websockets
-import sys
 import csv
 
 
