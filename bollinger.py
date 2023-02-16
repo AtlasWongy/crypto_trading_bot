@@ -47,7 +47,7 @@ async def calculate_bollinger_band(start_time, close_time, open_price, close_pri
     print("The close time is: ", end_time)
 
     # Write information to the csv file
-    with open('currency_info.csv', 'a', newline='') as file:
+    with open('csv/currency_info.csv', 'a', newline='') as file:
         writing = csv.writer(file)
         writing.writerow(
             [start_time, end_time, open_price, close_price, high_price, low_price, is_interval_end])
@@ -55,7 +55,7 @@ async def calculate_bollinger_band(start_time, close_time, open_price, close_pri
               high_price, low_price, is_interval_end])
         file.close()
 
-    with open("currency_info.csv", "r") as file_read, open('bollinger_band.csv', "r") as file_read_r:
+    with open("csv/currency_info.csv", "r") as file_read, open('csv/bollinger_band.csv', "r") as file_read_r:
         csvreader = pd.read_csv(file_read)
         csvreader_r = pd.read_csv(file_read_r)
         print("In interval " +
@@ -81,8 +81,8 @@ async def calculate_bollinger_band(start_time, close_time, open_price, close_pri
                 float(close_price), band_higher, band_lower)
             print(start_time, close_time, open_price, close_price, high_price, low_price,
                   is_interval_end, sma_calculated, stddev_calculated, band_higher, band_lower, buy_or_sell)
-            # Updat CSV
-            with open('bollinger_band.csv', 'a', newline='') as file_r:
+            # Update CSV
+            with open('csv/bollinger_band.csv', 'a', newline='') as file_r:
                 writing_r = csv.writer(file_r)  # results file
                 writing_r.writerow(
                     [start_time, close_time, open_price, close_price, high_price, low_price, is_interval_end, sma_calculated, stddev_calculated, band_higher, band_lower, buy_or_sell])
