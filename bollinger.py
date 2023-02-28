@@ -34,7 +34,7 @@ async def trade_condition(close_price, band_higher, band_lower):
         # buy()
     else:
         buy_or_sell = '-'
-        # neither buy or sell
+        # neither buy nor sell
     return buy_or_sell
 
 
