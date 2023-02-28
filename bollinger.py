@@ -38,7 +38,8 @@ async def trade_condition(close_price, band_higher, band_lower):
     return buy_or_sell
 
 
-async def calculate_bollinger_band(start_time, close_time, open_price, close_price, high_price, low_price, is_interval_end, kline_interval):
+async def calculate_bollinger_band(start_time, close_time, open_price, close_price, high_price, low_price,
+                                   is_interval_end, kline_interval):
     print("----------------")
     print("The open price: ", open_price)
     print("The close price: ", close_price)
@@ -70,7 +71,7 @@ async def calculate_bollinger_band(start_time, close_time, open_price, close_pri
         kline_ind = csvreader.index[csvreader['is_interval_end']
                                     == True].tolist()
         print(kline_ind)
-        if (len(kline_ind) >= periods and is_interval_end == True):
+        if len(kline_ind) >= periods and is_interval_end == True:
             # if (len(csvreader) >= periods + 1):
             print("Proceed calculating Bollinger Bands...")
             # print(kline_ind)
