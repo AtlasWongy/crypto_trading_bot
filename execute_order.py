@@ -17,10 +17,29 @@ SLEEP_TIME = 5
 #     asyncio.sleep(SLEEP_TIME)
 # return
 
+async def check_server_time(config) -> int:
+    endpoint = f"{config['http_base_url_test']}/fapi/v1/time"
+    response = requests.get(url=endpoint)
 
-async def execute_order(config, symbol, price, quantity):
-    endpoint = f"{config['http_base_url_test']}/dapi/v1/order"
-    data = createDataAndSignature(config['test_net_futures']['secure_key'], symbol, price, quantity)
+    server_time_dict_in_bytes = response.content
+    server_time_dict_in_string = server_time_dict_in_bytes.decode()
+
+    server_time_dict = json.loads(server_time_dict_in_string)
+    server_time = server_time_dict['serverTime']
+    server_time_int = int(server_time)
+
+    print(server_time_int)
+    return server_time_int
+
+async def ping_server(config) -> None:
+    endpoint = f"{config['http_base_url_test']}/fapi/v1/time"
+    response = requests.get(url=endpoint)
+
+    print(response.status_code)
+
+async def execute_order(config, symbol, price, quantity, current_server_time):
+    endpoint = f"{config['http_base_url_test']}/fapi/v1/order"
+    data = createDataAndSignature(config['test_net_futures']['secure_key'], symbol, price, quantity, current_server_time)
     headers = {
         "Content-Type": "application/x-www-form-urlencoded",
         "X-MBX-APIKEY": config['test_net_futures']['api_key']
@@ -29,7 +48,8 @@ async def execute_order(config, symbol, price, quantity):
 
     try:
         resp = requests.post(url=endpoint, headers=headers, data=data, timeout=10)
-        print("Error: ", resp.content)
+        print("The status code: ", resp.status_code)
+        print("The response: ", resp.content)
         return resp.status_code
     except requests.Timeout as error:
         # if timeout then just return
@@ -43,14 +63,14 @@ def hashing(secretKey, query_string):
     ).hexdigest()
 
 
-def createDataAndSignature(secretKey, symbol, price, quantity):
+def createDataAndSignature(secretKey, symbol, price, quantity, server_time):
     symbol = symbol
     side = "BUY"
     type = "LIMIT"
     timeInForce='GTC'
     price = price
     quantity = quantity
-    timestamp = int(time.time() * 1000)
+    timestamp = server_time
     signatureString = f"symbol={symbol}&side={side}&type={type}&quantity={quantity}&price={price}&timeInForce={timeInForce}&timestamp={timestamp}"
     signature = hashing(secretKey, signatureString)
 
@@ -69,7 +89,9 @@ def createDataAndSignature(secretKey, symbol, price, quantity):
 async def test():
     f = open('config.json')
     config = json.load(f)
-    await execute_order(config, "BTCUSD_230331", 23000, 100)
+    current_server_time = await check_server_time(config)
+    await ping_server(config)
+    await execute_order(config, "ETHUSDT", 1599.47, 10, current_server_time)
 
 if __name__ == "__main__":
     asyncio.run(test())
