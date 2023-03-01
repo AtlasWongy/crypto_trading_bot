@@ -46,6 +46,7 @@ async def get_current_price(config):
                 async for message in websocket:
                     try:
                         data = json.loads(message)
+                        print(data)
                         await calculate_bollinger_band(
                             data['k']['t'],
                             data['k']['T'],

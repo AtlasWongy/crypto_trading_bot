@@ -4,7 +4,7 @@ import csv
 
 # this plot to be changed
 periods = 20
-with open("bollinger_band.csv", "r") as file:
+with open("csv/bollinger_band.csv", "r") as file:
     csvreader = pd.read_csv(file)
     # , csvreader['SMA'],csvreader['Upper'], csvreader['Lower']
     # plt.plot(csvreader['close_price'], label="close_price")

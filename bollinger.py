@@ -34,32 +34,31 @@ async def trade_condition(close_price, band_higher, band_lower):
         # buy()
     else:
         buy_or_sell = '-'
-        # neither buy or sell
+        # neither buy nor sell
     return buy_or_sell
 
 
-async def calculate_bollinger_band(start_time, close_time, open_price, close_price, high_price, low_price, is_interval_end, kline_interval):
+async def calculate_bollinger_band(start_time, close_time, open_price, close_price, high_price, low_price,
+                                   is_interval_end, kline_interval):
     print("----------------")
     print("The open price: ", open_price)
     print("The close price: ", close_price)
     print("The high price: ", high_price)
     print("The low price: ", low_price)
-    # print("The start time: ", start_time) #this start and close time is for the 5 min candlestick
-    # print("The close time: ", close_time)
-
-    # Time conversion
-    # Convert unix timestamp to current normal time stamp
+    start_time, end_time = await unix_time_conversion(start_time, close_time)
+    print("The start time is: ", start_time)
+    print("The close time is: ", end_time)
 
     # Write information to the csv file
-    with open('currency_info.csv', 'a', newline='') as file:
+    with open('csv/currency_info.csv', 'a', newline='') as file:
         writing = csv.writer(file)
         writing.writerow(
-            [start_time, close_time, open_price, close_price, high_price, low_price, is_interval_end])
-        print([start_time, close_time, open_price, close_price,
+            [start_time, end_time, open_price, close_price, high_price, low_price, is_interval_end])
+        print([start_time, end_time, open_price, close_price,
               high_price, low_price, is_interval_end])
         file.close()
 
-    with open("currency_info.csv", "r") as file_read, open('bollinger_band.csv', "r") as file_read_r:
+    with open("csv/currency_info.csv", "r") as file_read, open('csv/bollinger_band.csv', "r") as file_read_r:
         csvreader = pd.read_csv(file_read)
         csvreader_r = pd.read_csv(file_read_r)
         print("In interval " +
@@ -72,7 +71,7 @@ async def calculate_bollinger_band(start_time, close_time, open_price, close_pri
         kline_ind = csvreader.index[csvreader['is_interval_end']
                                     == True].tolist()
         print(kline_ind)
-        if (len(kline_ind) >= periods and is_interval_end == True):
+        if len(kline_ind) >= periods and is_interval_end == True:
             # if (len(csvreader) >= periods + 1):
             print("Proceed calculating Bollinger Bands...")
             # print(kline_ind)
@@ -85,8 +84,8 @@ async def calculate_bollinger_band(start_time, close_time, open_price, close_pri
                 float(close_price), band_higher, band_lower)
             print(start_time, close_time, open_price, close_price, high_price, low_price,
                   is_interval_end, sma_calculated, stddev_calculated, band_higher, band_lower, buy_or_sell)
-            # Updat CSV
-            with open('bollinger_band.csv', 'a', newline='') as file_r:
+            # Update CSV
+            with open('csv/bollinger_band.csv', 'a', newline='') as file_r:
                 writing_r = csv.writer(file_r)  # results file
                 writing_r.writerow(
                     [start_time, close_time, open_price, close_price, high_price, low_price, is_interval_end, sma_calculated, stddev_calculated, band_higher, band_lower, buy_or_sell])
@@ -97,9 +96,11 @@ async def calculate_bollinger_band(start_time, close_time, open_price, close_pri
     file_read_r.close()
 
 
-# async def time_conversion(start_time_unix, close_time_unix):
-#     start_time = datetime.fromtimestamp(start_time_unix)
-#     close_time = datetime.fromtimestamp(close_time_unix)
+async def unix_time_conversion(unix_start, unix_end):
+    start_time = datetime.fromtimestamp(unix_start/1000)
+    end_time = datetime.fromtimestamp(unix_end/1000)
+    
+    end_time_str = end_time.strftime("%Y-%m-%d %H:%M:$S")
+    end_time = datetime.strptime(end_time_str, "%Y-%m-%d %H:%M:$S")
 
-#     return start_time, close_time
-#  csvreader['SMA'][-1] = csvreader[-periods - 1:]['close_price'].rolling(window=20).mean()
+    return start_time, end_time
