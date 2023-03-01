@@ -5,7 +5,7 @@ import asyncio
 
 # I use some smaller number to test because 20*5min is too larger to test.
 interval = 1  # 1min
-periods = 5
+periods = 20
 # update every 1 second, x min candle stick = x*60 row of records
 # hence, every 300 records >> will be one 5 min candle stick
 std = 2
@@ -99,7 +99,7 @@ async def calculate_bollinger_band(start_time, close_time, open_price, close_pri
 async def unix_time_conversion(unix_start, unix_end):
     start_time = datetime.fromtimestamp(unix_start/1000)
     end_time = datetime.fromtimestamp(unix_end/1000)
-    
+
     end_time_str = end_time.strftime("%Y-%m-%d %H:%M:$S")
     end_time = datetime.strptime(end_time_str, "%Y-%m-%d %H:%M:$S")
 
