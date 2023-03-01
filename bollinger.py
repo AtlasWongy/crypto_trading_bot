@@ -5,7 +5,7 @@ import asyncio
 
 # I use some smaller number to test because 20*5min is too larger to test.
 interval = 1  # 1min
-periods = 5
+periods = 20
 # update every 1 second, x min candle stick = x*60 row of records
 # hence, every 300 records >> will be one 5 min candle stick
 std = 2
