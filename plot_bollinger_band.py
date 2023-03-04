@@ -14,9 +14,9 @@ with open("csv/bollinger_band.csv", "r") as file:
     upper = csvreader['Upper'] .astype(float)
     lower = csvreader['Lower'].astype(float)
     buy_ind = csvreader.index[csvreader['Buy/Sell']
-                              == 'buy'].tolist()
+                              == 'BUY'].tolist()
     sell_ind = csvreader.index[csvreader['Buy/Sell']
-                               == 'sell'].tolist()
+                               == 'SELL'].tolist()
     plt.plot(csvreader['SMA'].astype(float), label="SMA")
     plt.plot(csvreader['close_price']
              .astype(float), label="close_price")
