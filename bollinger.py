@@ -1,6 +1,8 @@
-from datetime import datetime, timezone
 import pandas as pd
 import csv
+import json
+from datetime import datetime, timezone
+from execute_order import execute_order, check_server_time
 import asyncio
 
 # I use some smaller number to test because 20*5min is too larger to test.
@@ -25,13 +27,22 @@ async def sma_std(kline_interval, periods, kline_ind):
 
 
 async def trade_condition(close_price, band_higher, band_lower):
+
+    # Config load here (Temporary). Try to remove this or rework execute_order function in a different way.
+    f = open('config.json')
+    config = json.load(f)
+
+    current_server_time = await check_server_time(config)
+
     buy_or_sell = None
     if close_price > band_higher:
-        buy_or_sell = 'sell'
+        buy_or_sell = 'SELL'
         # sell()
+        await execute_order(config, "ETHUSDT", 1599.47, 10, current_server_time, buy_or_sell)
     elif close_price < band_lower:
-        buy_or_sell = 'buy'
+        buy_or_sell = 'BUY'
         # buy()
+        await execute_order(config, "ETHUSDT", 1599.47, 10, current_server_time, buy_or_sell)
     else:
         buy_or_sell = '-'
         # neither buy nor sell

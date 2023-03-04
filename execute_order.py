@@ -43,7 +43,7 @@ async def ping_server(config) -> None:
 async def execute_order(config, symbol, price, quantity, current_server_time, side):
     endpoint = f"{config['http_base_url_test']}/fapi/v1/order"
     data = await createDataAndSignature(config['test_net_futures']['secure_key'], symbol, price, quantity,
-                                        current_server_time)
+                                        current_server_time, side)
     headers = {
         "Content-Type": "application/x-www-form-urlencoded",
         "X-MBX-APIKEY": config['test_net_futures']['api_key']
@@ -67,9 +67,9 @@ async def hashing(secret_key, query_string):
     ).hexdigest()
 
 
-async def createDataAndSignature(secretKey, symbol, price, quantity, server_time):
+async def createDataAndSignature(secretKey, symbol, price, quantity, server_time, side):
     symbol = symbol
-    side = "SELL"
+    side = side
     type = "LIMIT"
     timeInForce = 'GTC'
     price = price
@@ -91,13 +91,13 @@ async def createDataAndSignature(secretKey, symbol, price, quantity, server_time
     return data
 
 
-async def test():
-    f = open('config.json')
-    config = json.load(f)
-    current_server_time = await check_server_time(config)
-    await ping_server(config)
-    await execute_order(config, "ETHUSDT", 1599.47, 10, current_server_time)
-
-
-if __name__ == "__main__":
-    asyncio.run(test())
+# async def test():
+#     f = open('config.json')
+#     config = json.load(f)
+#     current_server_time = await check_server_time(config)
+#     await ping_server(config)
+#     await execute_order(config, "ETHUSDT", 1599.47, 10, current_server_time)
+#
+#
+# if __name__ == "__main__":
+#     asyncio.run(test())
