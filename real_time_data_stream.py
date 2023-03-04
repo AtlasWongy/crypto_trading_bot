@@ -72,7 +72,7 @@ async def main():
     f = open('config.json')
     config = json.load(f)
     # clean csv for each run
-    await clean_csv('currency_info.csv', 'bollinger_band.csv')
+    await clean_csv('csv/currency_info.csv', 'csv/bollinger_band.csv')
     await get_current_price(config)
 
 
