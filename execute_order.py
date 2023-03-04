@@ -91,13 +91,13 @@ async def createDataAndSignature(secretKey, symbol, price, quantity, server_time
     return data
 
 
-# async def test():
-#     f = open('config.json')
-#     config = json.load(f)
-#     current_server_time = await check_server_time(config)
-#     await ping_server(config)
-#     await execute_order(config, "ETHUSDT", 1599.47, 10, current_server_time)
-#
-#
-# if __name__ == "__main__":
-#     asyncio.run(test())
+async def test():
+    f = open('config.json')
+    config = json.load(f)
+    current_server_time = await check_server_time(config)
+    await ping_server(config)
+    await execute_order(config, "ETHUSDT", 1599.47, 10, current_server_time)
+
+
+if __name__ == "__main__":
+    asyncio.run(test())
