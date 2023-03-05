@@ -18,6 +18,7 @@ SLEEP_TIME = 5
 #     asyncio.sleep(SLEEP_TIME)
 # return
 
+
 async def check_server_time(config) -> int:
     endpoint = f"{config['http_base_url_test']}/fapi/v1/time"
     response = requests.get(url=endpoint)
@@ -86,7 +87,33 @@ async def createDataAndSignature(secretKey, symbol, price, quantity, server_time
         "price": price,
         "timeInForce": timeInForce,
         "timestamp": timestamp,
-        "signature": signature
+        "signature": signature,
+    }
+    return data
+
+
+async def createDataAndSignatureStop(secretKey, symbol, price, quantity, server_time, side):
+    symbol = symbol
+    side = side
+    type = "STOP"
+    timeInForce = 'GTC'
+    price = price
+    stopPrice = price - 5
+    quantity = quantity
+    timestamp = server_time
+    signatureString = f"symbol={symbol}&side={side}&type={type}&quantity={quantity}&price={price}&stopPrice={stopPrice}&timeInForce={timeInForce}&timestamp={timestamp}"
+    signature = await hashing(secretKey, signatureString)
+
+    data = {
+        "symbol": symbol,
+        "side": side,
+        "type": type,
+        "quantity": quantity,
+        "price": price,
+        "stopPrice": stopPrice,
+        "timeInForce": timeInForce,
+        "timestamp": timestamp,
+        "signature": signature,
     }
     return data
 
