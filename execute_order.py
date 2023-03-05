@@ -24,11 +24,15 @@ async def byte_unpack_loader(response_in_bytes):
     return response_dict
 
 
-async def check_order_status(config, symbol, current_server_time,  order_id):
+async def check_order_status(config, symbol, order_id):
     endpoint = f"{config['http_base_url_test']}/fapi/v1/openOrder"
-    data = await createDataAndSignature(secretKey=config['test_net_futures']['secure_key'],
-                                                   symbol=symbol, server_time=current_server_time,
-                                        order_id=order_id, execution_type='CHECK_ORDER')
+    data = await createDataAndSignature(
+        config=config,
+        secretKey=config['test_net_futures']['secure_key'],
+        symbol=symbol,
+        order_id=order_id,
+        execution_type='CHECK_ORDER'
+    )
 
     headers = {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -71,8 +75,17 @@ async def ping_server(config) -> None:
 
 async def execute_order(config, symbol, price, quantity, current_server_time, side, execution_type):
     endpoint = f"{config['http_base_url_test']}/fapi/v1/order"
-    data = await createDataAndSignature(config['test_net_futures']['secure_key'], symbol, price, quantity,
-                                        current_server_time, side, execution_type)
+    data = await createDataAndSignature(
+        config=config,
+        secretKey=config['test_net_futures']['secure_key'],
+        symbol=symbol,
+        price=price,
+        quantity=quantity,
+        server_time=current_server_time,
+        side=side,
+        execution_type=execution_type
+    )
+
     headers = {
         "Content-Type": "application/x-www-form-urlencoded",
         "X-MBX-APIKEY": config['test_net_futures']['api_key']
@@ -83,6 +96,7 @@ async def execute_order(config, symbol, price, quantity, current_server_time, si
         print("The status code: ", resp.status_code)
 
         response_unloaded = await byte_unpack_loader(resp.content)
+        print(response_unloaded)
         order_id = response_unloaded['orderId']
 
         return resp.status_code, order_id
@@ -99,9 +113,12 @@ async def hashing(secret_key, query_string):
 
 
 async def createDataAndSignature(
-        secretKey, symbol, price=0, quantity=0, server_time=0, side='', execution_type='', order_id='0'):
+        config, secretKey, symbol, price=0, quantity=0, server_time=0, side='', execution_type='', order_id='0'):
 
     if execution_type == "LIMIT":
+
+        print("The current server time: ", server_time)
+
         symbol = symbol
         side = side
         type = execution_type
@@ -122,8 +139,10 @@ async def createDataAndSignature(
             "timestamp": timestamp,
             "signature": signature,
         }
+
         return data
     elif execution_type == "CHECK_ORDER":
+        server_time = await check_server_time(config=config)
         signature_string = f"symbol={symbol}&orderId={order_id}&timestamp={server_time}&recvWindow={5000}"
         signature = await hashing(secretKey, signature_string)
 
@@ -148,8 +167,7 @@ async def test():
     await ping_server(config)
     status_code, order_id = await execute_order(config, "ETHUSDT", 1400, 10, current_server_time, "BUY", "LIMIT")
 
-    while await check_order_status(config=config, symbol="ETHUSDT",
-                             current_server_time=current_server_time, order_id=order_id) != "FILLED":
+    while await check_order_status(config=config, symbol="ETHUSDT", order_id=order_id) != "FILLED":
         time.sleep(5)
         print("order is not fulfilled....")
         continue
