@@ -165,12 +165,23 @@ async def test():
     config = json.load(f)
     current_server_time = await check_server_time(config)
     await ping_server(config)
+
+    # Execute
     status_code, order_id = await execute_order(config, "ETHUSDT", 1400, 10, current_server_time, "BUY", "LIMIT")
 
+    # Check if order is finished
     while await check_order_status(config=config, symbol="ETHUSDT", order_id=order_id) != "FILLED":
         time.sleep(5)
         print("order is not fulfilled....")
         continue
+    # Web Socket
+    # Yi Jie
+
+    # Stop
+    # Hui Wen
+
+    # Take Profit
+    # Hui Wen
 
 
 if __name__ == "__main__":
