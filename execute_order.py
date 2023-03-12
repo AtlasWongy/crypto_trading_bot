@@ -111,7 +111,7 @@ async def ping_server(config) -> None:
 
 
 async def execute_order(config, symbol, price, quantity, current_server_time, side, execution_type):
-    await asyncio.sleep(0.5)
+    await asyncio.sleep(0.45)
     endpoint = f"{config['http_base_url_test']}/fapi/v1/order"
     data = await createDataAndSignature(
         config=config,
