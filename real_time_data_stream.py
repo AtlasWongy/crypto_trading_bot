@@ -42,7 +42,7 @@ async def get_current_price(config):
                 # Create an asyncio task to send a pong frame every 5 mins
                 asyncio.create_task(ping(websocket, config['ping_interval']))
 
-                # Continously receive data from the websocket
+                # Continuously receive data from the websocket
                 async for message in websocket:
                     try:
                         data = json.loads(message)

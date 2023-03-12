@@ -4,6 +4,7 @@ import hmac
 import json
 import time
 import requests
+import websockets
 
 # API for create new order: https://binance-docs.github.io/apidocs/delivery/en/#new-order-trade
 # TRADE	endpoint requires sending a valid API-Key and signature.
@@ -55,6 +56,42 @@ async def check_order_status(config, symbol, order_id):
         return HTTP_TIME_OUT
 
 
+async def check_order_status_socket(config):
+    get_listen_key_endpoint = f"{config['http_base_url_test']}/fapi/v1/listenKey"
+    response = requests.post(
+        url=get_listen_key_endpoint,
+        headers={'X-MBX-APIKEY': config['test_net_futures']['api_key']}
+    )
+    listen_key = response.json()['listenKey']
+    web_socket_endpoint = f"{config['test_net_futures']['test_net_url']}/{listen_key}"
+    while True:
+        try:
+            async with websockets.connect(web_socket_endpoint) as websocket:
+                payload = {
+                    'apiKey': config['test_net_futures']['api_key'],
+                    'secretKey': config['test_net_futures']['secure_key']
+                }
+                await websocket.send(json.dumps(payload))
+
+                async for message in websocket:
+                    data = json.loads(message)
+                    try:
+                        if data['e'] == 'ORDER_TRADE_UPDATE':
+                            print(data)
+                        #     if data['o']['X'] == 'FILLED':
+                        #         print('SEND THE TAKE PROFIT AND STOP LOSS')
+                        #     else:
+                        #         print('Order is not fulfilled...')
+
+                    except KeyError:
+                        print("Faulty data received from API")
+                        continue
+
+        except websockets.exceptions.ConnectionClosed:
+            print('Retrying Connection')
+            continue
+
+
 async def check_server_time(config) -> int:
     endpoint = f"{config['http_base_url_test']}/fapi/v1/time"
     response = requests.get(url=endpoint)
@@ -74,6 +111,7 @@ async def ping_server(config) -> None:
 
 
 async def execute_order(config, symbol, price, quantity, current_server_time, side, execution_type):
+    await asyncio.sleep(0.5)
     endpoint = f"{config['http_base_url_test']}/fapi/v1/order"
     data = await createDataAndSignature(
         config=config,
@@ -114,7 +152,6 @@ async def hashing(secret_key, query_string):
 
 async def createDataAndSignature(
         config, secretKey, symbol, price=0, quantity=0, server_time=0, side='', execution_type='', order_id='0'):
-
     if execution_type == "LIMIT":
 
         print("The current server time: ", server_time)
@@ -167,15 +204,24 @@ async def test():
     await ping_server(config)
 
     # Execute
-    status_code, order_id = await execute_order(config, "ETHUSDT", 1400, 10, current_server_time, "BUY", "LIMIT")
+    # status_code, order_id = await execute_order(config, "ETHUSDT", 1470, 1, current_server_time, "BUY", "LIMIT")
+    execute_order_task = asyncio.create_task(
+        execute_order(config, "ETHUSDT", 1470, 1, current_server_time, "BUY", "LIMIT")
+    )
 
     # Check if order is finished
-    while await check_order_status(config=config, symbol="ETHUSDT", order_id=order_id) != "FILLED":
-        time.sleep(5)
-        print("order is not fulfilled....")
-        continue
+    # while await check_order_status(config=config, symbol="ETHUSDT", order_id=order_id) != "FILLED":
+    #     time.sleep(5)
+    #     print("order is not fulfilled....")
+    #     continue
     # Web Socket
     # Yi Jie
+    # await check_order_status_socket(config)
+    check_order_status_task = asyncio.create_task(
+        check_order_status_socket(config)
+    )
+
+    await asyncio.gather(execute_order_task, check_order_status_task)
 
     # Stop
     # Hui Wen
