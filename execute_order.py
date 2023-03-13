@@ -220,8 +220,10 @@ async def test():
     check_order_status_task = asyncio.create_task(
         check_order_status_socket(config)
     )
-
+    #
     await asyncio.gather(execute_order_task, check_order_status_task)
+
+    # Testing Git
 
     # Stop
     # Hui Wen
